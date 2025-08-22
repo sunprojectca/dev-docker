@@ -1,0 +1,72 @@
+services:  # Values pulled from .env automatically
+  redis:
+    container_name: redis
+    image: redis/redis-stack-server:latest
+    ports:
+      - "6379:6379"         # Redis
+    volumes:
+      - ./volumes/redis:/data
+      - ./volumes/shared:/shared
+    networks: [devnet]
+
+  redisinsight:
+    container_name: redisinsight
+    image: redis/redisinsight:latest
+    depends_on: { redis: { condition: service_started } }
+    ports:
+      - "5540:5540"         # RedisInsight UI
+    environment:
+      - RIHOST=${RIHOST}
+      - RIPORT=${RIPORT}
+    volumes:
+      - ./volumes/redisinsight:/db
+      - ./redisinsight-config:/config
+      - ./volumes/shared:/shared
+    networks: [devnet]
+
+  fastapi:
+    container_name: fastapi
+    build: ./fastapi
+    depends_on: { redis: { condition: service_started } }
+    ports:
+      - "8000:8000"         # FastAPI
+    volumes:
+      - ./fastapi:/app                 # Source code
+      - ./volumes/uploads:/app/uploads # Uploaded files
+      - ./volumes/shared:/shared       # Shared cross-service
+      - ./volumes/datasets:/data/datasets
+    networks: [devnet]
+
+  jupyter:
+    container_name: jupyter
+    image: jupyter/scipy-notebook:latest
+    ports:
+      - "8888:8888"         # JupyterLab
+    environment:
+      - JUPYTER_TOKEN=${JUPYTER_TOKEN}
+    volumes:
+      - ./volumes/notebooks:/home/jovyan/work
+      - ./volumes/jupyter-user:/home/jovyan/.local   # User packages/settings
+      - ./volumes/shared:/shared
+      - ./volumes/datasets:/data/datasets
+    networks: [devnet]
+
+  code:
+    container_name: code-server
+    image: linuxserver/code-server:latest
+    ports:
+      - "8443:8443"         # code-server
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - PASSWORD=${CODE_PASSWORD}
+    volumes:
+      - ./volumes/code:/config
+      - ./volumes/shared:/shared
+      - ./volumes/datasets:/data/datasets
+    networks: [devnet]
+
+networks:
+  devnet:
+    driver: bridge

@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+
+# Virtual environments
+venv/
+.env.local
+
+# Environment & secrets
+.env
+*.env
+!important.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Docker volumes (keep data outside git)
+volumes/
+!volumes/README.md
+
+# Logs
+*.log
+logs/
+
+# Redis data dumps
+*.rdb
+
+# OS files
+.DS_Store
+Thumbs.db

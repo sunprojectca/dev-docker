@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+redis
+pandas
+python-multipart
+openai>=1.0.0
