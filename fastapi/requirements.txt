@@ -4,3 +4,5 @@ redis
 pandas
 python-multipart
 openai>=1.0.0
+xgboost
+scikit-learn
